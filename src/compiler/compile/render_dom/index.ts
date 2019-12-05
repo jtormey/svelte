@@ -39,11 +39,11 @@ export default function dom(
 
 	if (styles && component.compile_options.css !== false && !options.customElement) {
 		builder.add_block(deindent`
-			function ${add_css}() {
+			function ${add_css}(document) {
 				var style = @element("style");
 				style.id = '${component.stylesheet.id}-style';
 				style.textContent = ${styles};
-				@append(@_document.head, style);
+				@append(document.head, style);
 			}
 		`);
 	}
@@ -440,11 +440,14 @@ export default function dom(
 			class ${name} extends @${superclass} {
 				constructor(options) {
 					super(${options.dev && `options`});
-					${should_add_css && `if (!@_document.getElementById("${component.stylesheet.id}-style")) ${add_css}();`}
 					@init(this, options, ${definition}, create_fragment, ${not_equal}, ${prop_names});
 					${options.dev && `@dispatch_dev("SvelteRegisterComponent", { component: this, tagName: "${name}", options, id: create_fragment.name });`}
 
 					${dev_props_check}
+				}
+
+				append_styles (target) {
+					${should_add_css && `if (!@_document.getElementById("${component.stylesheet.id}-style")) ${add_css}(target.ownerDocument);`}
 				}
 
 				${body.length > 0 && body.join('\n\n')}

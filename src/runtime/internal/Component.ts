@@ -30,6 +30,7 @@ export function bind(component, name, callback) {
 export function mount_component(component, target, anchor) {
 	const { fragment, on_mount, on_destroy, after_update } = component.$$;
 
+	component.append_styles(target)
 	fragment.m(target, anchor);
 
 	// onMount happens before the initial afterUpdate
